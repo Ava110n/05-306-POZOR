@@ -29,30 +29,26 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
-    var xMin by remember { mutableStateOf(-5.0f) }
-    var xMax by remember { mutableStateOf(5.0f) }
-    var yMin by remember { mutableStateOf(-5.0f) }
-    var yMax by remember { mutableStateOf(5.0f) }
     var show by remember { mutableStateOf(false) }
     var isX by remember { mutableStateOf(true) }
-
-
+    var info by remember { mutableStateOf(SizeInfo(0f, 0f, -5f, 5f, -5f, 5f)) }
     Row {
         Column(modifier = Modifier.weight(3f)) {
             Canvas(Modifier.fillMaxSize().background(Color.LightGray)) {
-                var info = SizeInfo(size.width, size.height, xMin, xMax, yMin, yMax)
+                info.width = size.width
+                info.height = size.height
                 drawLine(
                     Color.Black,
-                    Screen(Cartesian(xMin, 0f), info).toOffset(),
-                    Screen(Cartesian(xMax, 0f), info).toOffset()
+                    Screen(Cartesian(info.xMin, 0f), info).toOffset(),
+                    Screen(Cartesian(info.xMax, 0f), info).toOffset()
                 )
                 drawCircle(Color.Black, radius = 10f, Screen(Cartesian(1f, 0f), info).toOffset())
                 drawCircle(Color.Black, radius = 10f, Screen(Cartesian(0f, 1f), info).toOffset())
 
                 drawLine(
                     Color.Black,
-                    Screen(Cartesian(0f, yMin), info).toOffset(),
-                    Screen(Cartesian(0f, yMax), info).toOffset()
+                    Screen(Cartesian(0f, info.yMin), info).toOffset(),
+                    Screen(Cartesian(0f, info.yMax), info).toOffset()
                 )
 
             }
@@ -68,16 +64,16 @@ fun App() {
                     Text("Y", modifier = Modifier.padding(0.dp, 12.5.dp))
                 }
                 TextField(
-                    if (isX) xMin.toString() else yMin.toString(),
+                    if (isX) info.xMin.toString() else info.yMin.toString(),
                     {
                         if (isX) {
-                            xMin = it.toFloat()
-                        } else yMin = it.toFloat()
+                            info.xMin = it.toFloatOrNull() ?: info.xMin
+                        } else info.yMin = it.toFloatOrNull() ?: info.yMin
                     },
                 )
-                TextField(if (isX) xMax.toString() else yMax.toString(), {
-                    if (isX) xMax = it.toFloat()
-                    else yMax = it.toFloat()
+                TextField(if (isX) info.xMax.toString() else info.yMax.toString(), {
+                    if (isX) info.xMax = it.toFloatOrNull() ?: info.xMax
+                    else info.yMax = it.toFloatOrNull() ?: info.yMax
                 })
             }
         }
