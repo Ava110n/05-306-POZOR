@@ -65,8 +65,19 @@ fun App() {
             )
         )
     }
+    var deltaX = 0f
+    var deltaY = 0f
     Row {
-        Canvas(Modifier.fillMaxSize().background(Color.LightGray)) {
+        Canvas(Modifier.fillMaxSize().
+        background(Color.LightGray).
+        onPointerEvent(PointerEventType.Scroll) {
+            val pos = it.changes.first().position
+            val scrollDelta = it.changes.first().scrollDelta
+            if (scrollDelta.y < 0)
+                info.zoom(pos)
+
+
+        }) {
             info.width = size.width
             info.height = size.height
             drawMandelbrot(info)
@@ -74,7 +85,8 @@ fun App() {
     }
 }
 
-suspend fun mandelbrot(cartesian: Cartesian): Int {
+
+fun mandelbrot(cartesian: Cartesian): Int {
     var zn = Complex(0f, 0f)
     var c = Complex(cartesian)
     var n = 0
@@ -126,8 +138,6 @@ fun color2(n: Int) = Color(
 
 
 fun DrawScope.drawMandelbrot(size: SizeInfo) {
-    val cpus = Runtime.getRuntime().availableProcessors()
-    val c = Channel<Pair<Screen, Int>>()
     val myFlow: Flow<Pair<Screen, Int>> = channelFlow {
         for (i in 0 until size.width.toInt()) {
             launch(Dispatchers.Default) {
@@ -140,7 +150,7 @@ fun DrawScope.drawMandelbrot(size: SizeInfo) {
             }
         }
     }
-    runBlocking<Unit> {
+    runBlocking {
         myFlow.collect {
             drawCircle(color(it.second), 1.0f, it.first.toOffset())
         }
