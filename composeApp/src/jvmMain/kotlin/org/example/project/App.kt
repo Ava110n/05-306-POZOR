@@ -33,78 +33,11 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
-    var show by remember { mutableStateOf(false) }
-    var isX by remember { mutableStateOf(true) }
     var info by remember { mutableStateOf(SizeInfo(0f, 0f, -5f, 5f, -5f, 5f)) }
-    var dots by remember { mutableStateOf(ArrayList<Cartesian>()) }
     Row {
-        Column(modifier = Modifier.weight(3f)) {
-            Canvas(Modifier.fillMaxSize().background(Color.LightGray).onPointerEvent(PointerEventType.Press) {
-                val cords = it.changes.first().position
-//                val b = it.button ?: return@onPointerEvent
-//                if (b.index != 0) return@onPointerEvent
-                dots.add(Cartesian(Screen(cords), info))
-            }) {
-                info.width = size.width
-                info.height = size.height
-                drawLine(
-                    Color.Black,
-                    Screen(Cartesian(info.xMin, 0f), info).toOffset(),
-                    Screen(Cartesian(info.xMax, 0f), info).toOffset()
-                )
-                drawCircle(Color.Black, radius = 10f, Screen(Cartesian(1f, 0f), info).toOffset())
-                drawCircle(Color.Black, radius = 10f, Screen(Cartesian(0f, 1f), info).toOffset())
-                for (i in dots) {
-                    drawCircle(Color.Black, radius = 2f, Screen(i, info).toOffset())
-                }
-                drawLine(
-                    Color.Black,
-                    Screen(Cartesian(0f, info.yMin), info).toOffset(),
-                    Screen(Cartesian(0f, info.yMax), info).toOffset()
-                )
-
-            }
-        }
-        if (!show) {
-            Column(modifier = Modifier.weight(1f)) {
-                Row {
-                    RadioButton(isX, { isX = true })
-                    Text("X", modifier = Modifier.padding(0.dp, 12.5.dp))
-                }
-                Row {
-                    RadioButton(!isX, { isX = false })
-                    Text("Y", modifier = Modifier.padding(0.dp, 12.5.dp))
-                }
-                TextField(
-                    if (isX) info.xMin.toString() else info.yMin.toString(),
-                    {
-                        if (isX) {
-                            info.xMin = it.toFloatOrNull() ?: info.xMin
-                            info.ifChangedX()
-                        } else {
-                            info.yMin = it.toFloatOrNull() ?: info.yMin
-                            info.ifChangedY()
-                        }
-                    },
-                )
-                TextField(if (isX) info.xMax.toString() else info.yMax.toString(), {
-                    if (isX) {
-                        info.xMax = it.toFloatOrNull() ?: info.xMax
-                        info.ifChangedX()
-                    } else {
-                        info.yMax = it.toFloatOrNull() ?: info.yMax
-                        info.ifChangedY()
-                    }
-                })
-            }
+        Canvas(Modifier.fillMaxSize().background(Color.LightGray)) {
+            info.width = size.width
+            info.height = size.height
         }
     }
-    Switch(show, { b ->
-        show = b
-    })
-
-}
-
-fun newValuesX() {
-
 }
